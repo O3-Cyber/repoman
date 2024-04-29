@@ -91,6 +91,53 @@ client = GithubSecretsClient('your_github_token', 'org_or_user')
 client.add_secrets('repo_name', 'secret_name', 'secret_value')
 ```
 
+### Backing up a GitHub Organization
+
+```python
+import os
+import logging
+from package.backupclient import GithubBackupClientAzure
+from package.repoclient import GithubRepoClient
+from package.secretsclient import GithubSecretsClient
+from package.teamclient import GithubTeamClient
+from package.utils import load_env_vars
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
+def load_env_vars(var_names):
+    return {var: os.getenv(var) for var in var_names}
+
+def main():
+    env_vars = load_env_vars([
+        'GITHUB_TOKEN',
+        'ORG_OR_USER',
+        'AZURE_STORAGE_ACCOUNT_NAME',
+        'AZURE_STORAGE_CONTAINER_NAME'
+    ])
+    missing_vars = [var for var, value in env_vars.items() if value is None]
+    if missing_vars:
+        error_message = f'Missing environment variables: {", ".join(missing_vars)}'
+        logging.error(error_message)
+        raise ValueError(error_message) 
+    try:
+        logging.info("Starting backup process...")
+        backup = GithubBackupClientAzure(
+            env_vars['GITHUB_TOKEN'], 
+            env_vars['ORG_OR_USER'], 
+            env_vars['AZURE_STORAGE_ACCOUNT_NAME'], 
+            env_vars['AZURE_STORAGE_CONTAINER_NAME']
+        )
+        backup.create_gh_backup()
+        logging.info("Backup process completed.")
+    except Exception as e:
+        logging.error(f"An error occurred while creating backups: {e}")
+        return
+
+
+if __name__ == "__main__":
+    main()
+```
 ### Creating a Repositories object
 
 The first part of this section shows an array of objects, each representing a repository to be created. Each object can contain the following properties:
