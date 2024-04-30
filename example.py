@@ -24,7 +24,6 @@ def main():
         error_message = f'Missing environment variables: {", ".join(missing_vars)}'
         logging.error(error_message)
         raise ValueError(error_message) 
-    """
     try:
         logging.info("Starting backup process...")
         backup = GithubBackupClientAzure(
@@ -38,7 +37,7 @@ def main():
     except Exception as e:
         logging.error(f"An error occurred while creating backups: {e}")
         return
-    """
+
     branch_protection_payload = {
         "required_status_checks": None,
         "enforce_admins": True,
